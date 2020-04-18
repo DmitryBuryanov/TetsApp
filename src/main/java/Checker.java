@@ -9,15 +9,16 @@ public class Checker extends StackPane {
     public int color;
 
     public Checker(int x, int y, int color) {
+        this.x = x;
+        this.y = y;
         this.color = color;
 
         Circle circle = new Circle();
-        circle.setCenterX(x);
-        circle.setCenterY(y);
-        circle.setRadius(50);
+
+        circle.setRadius(40);
         circle.setFill(color());
 
-        relocate(x * 100, y * 100);
+        relocate((x + 0.1) * 100, (y + 0.1) * 100);
 
         getChildren().add(circle);
     }
