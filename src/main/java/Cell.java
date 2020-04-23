@@ -32,4 +32,8 @@ public class Cell extends Rectangle {
     public Checker getChecker() {
         return checker;
     }
+
+    public boolean hasChecker() {
+        return getChecker() != null;
+    }
 }
