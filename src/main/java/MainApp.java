@@ -65,7 +65,6 @@ public class MainApp extends Application {
         else {
             int nowX = (int) Math.floor(checker.getOldX() / 100);
             int nowY = (int) Math.floor(checker.getOldY() / 100);
-            System.out.println(checker.isDamka);
             if (!checker.isDamka) {
                 if (checker.color == 1 && Math.abs(newX - nowX) == 1 && newY - nowY == 1 ||
                         checker.color == 0 && Math.abs(newX - nowX) == 1 && newY - nowY == -1) {
@@ -108,7 +107,6 @@ public class MainApp extends Application {
 
             if (newX < 0 || newY < 0 || newX > 7 || newY > 7) moveResult = 0;
             else moveResult = canMove(newX, newY, checker);
-            System.out.println(moveResult);
 
             if (moveResult == 0) {
                 checker.getBack();
@@ -175,7 +173,7 @@ public class MainApp extends Application {
                         board[xx][yy].setChecker(null);
                         checkers.getChildren().remove(evil);
                     }
-                    previousMoveColor = checker.color;
+                    if (!canByte(board[newX][newY])) previousMoveColor = checker.color;
 
                     if (checker.color == 1 && newY == 7) checker.isDamka = true;
                     if (checker.color == 0 && newY == 0) checker.isDamka = true;
@@ -243,81 +241,89 @@ public class MainApp extends Application {
         return "";
     }
 
+
     public boolean cellExist(int x, int y) {
         return x >= 0 && x <= 7 && y >= 0 && y <= 7;
+    }
+
+    public boolean canByte(Cell cell) {
+        if (cell.hasChecker()) {
+            int i = cell.x;
+            int j = cell.y;
+            if (!cell.getChecker().isDamka) {
+                if (cellExist(i + 2, j + 2) && board[i + 1][j + 1].hasChecker() && !board[i + 2][j + 2].hasChecker()
+                        && board[i + 1][j + 1].getChecker().color != cell.getChecker().color) return true;
+                if (cellExist(i + 2, j - 2) && board[i + 1][j - 1].hasChecker() && !board[i + 2][j - 2].hasChecker()
+                        && board[i + 1][j - 1].getChecker().color != cell.getChecker().color) return true;
+                if (cellExist(i - 2, j + 2) && board[i - 1][j + 1].hasChecker() && !board[i - 2][j + 2].hasChecker()
+                        && board[i - 1][j + 1].getChecker().color != cell.getChecker().color) return true;
+                if (cellExist(i - 2, j - 2) && board[i - 1][j - 1].hasChecker() && !board[i - 2][j - 2].hasChecker()
+                        && board[i - 1][j - 1].getChecker().color != cell.getChecker().color) return true;
+            } else {
+                int nowX = i;
+                int nowY = j;
+                while (nowX != 0 && nowY != 0) {
+                    nowX--;
+                    nowY--;
+                    if (cellExist(nowX, nowY)) {
+                        if (board[nowX][nowY].hasChecker()) {
+                            if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX - 1, nowY - 1) &&
+                                    !board[nowX - 1][nowY - 1].hasChecker()) return true;
+                        }
+                    }
+                }
+
+                nowX = i;
+                nowY = j;
+                while (nowX != 7 && nowY != 0) {
+                    nowX++;
+                    nowY--;
+                    if (cellExist(nowX, nowY)) {
+                        if (board[nowX][nowY].hasChecker()) {
+                            if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX + 1, nowY - 1) &&
+                                    !board[nowX + 1][nowY - 1].hasChecker()) return true;
+                        }
+                    }
+                }
+
+                nowX = i;
+                nowY = j;
+                while (nowX != 7 && nowY != 7) {
+                    nowX++;
+                    nowY++;
+                    if (cellExist(nowX, nowY)) {
+                        if (board[nowX][nowY].hasChecker()) {
+                            if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX + 1, nowY + 1) &&
+                                    !board[nowX + 1][nowY + 1].hasChecker()) return true;
+                        }
+                    }
+                }
+
+                nowX = i;
+                nowY = j;
+                while (nowX != 0 && nowY != 7) {
+                    nowX--;
+                    nowY++;
+                    if (cellExist(nowX, nowY)) {
+                        if (board[nowX][nowY].hasChecker()) {
+                            if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX - 1, nowY + 1) &&
+                                    !board[nowX - 1][nowY + 1].hasChecker()) return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public boolean needtobyteforWhite() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 0) {
-                    if (!board[i][j].getChecker().isDamka) {
-                        if (cellExist(i + 2, j + 2) && board[i + 1][j + 1].hasChecker() && !board[i + 2][j + 2].hasChecker()
-                                && board[i + 1][j + 1].getChecker().color == 1) return true;
-                        if (cellExist(i + 2, j - 2) && board[i + 1][j - 1].hasChecker() && !board[i + 2][j - 2].hasChecker()
-                                && board[i + 1][j - 1].getChecker().color == 1) return true;
-                        if (cellExist(i - 2, j + 2) && board[i - 1][j + 1].hasChecker() && !board[i - 2][j + 2].hasChecker()
-                                && board[i - 1][j + 1].getChecker().color == 1) return true;
-                        if (cellExist(i - 2, j - 2) && board[i - 1][j - 1].hasChecker() && !board[i - 2][j - 2].hasChecker()
-                                && board[i - 1][j - 1].getChecker().color == 1) return true;
-                    } else {
-                        int nowX = i;
-                        int nowY = j;
-                        while (nowX != 0 && nowY != 0) {
-                            nowX--;
-                            nowY--;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 0) break;
-                                    if (board[nowX][nowY].getChecker().color == 1 && cellExist(nowX - 1, nowY - 1) &&
-                                            !board[nowX - 1][nowY - 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-
-                        nowX = i;
-                        nowY = j;
-                        while (nowX != 7 && nowY != 0) {
-                            nowX++;
-                            nowY--;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 0) break;
-                                    if (board[nowX][nowY].getChecker().color == 1 && cellExist(nowX + 1, nowY - 1) &&
-                                            !board[nowX + 1][nowY - 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-
-                        nowX = i;
-                        nowY = j;
-                        while (nowX != 7 && nowY != 7) {
-                            nowX++;
-                            nowY++;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 0) break;
-                                    if (board[nowX][nowY].getChecker().color == 1 && cellExist(nowX + 1, nowY + 1) &&
-                                            !board[nowX + 1][nowY + 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-
-                        nowX = i;
-                        nowY = j;
-                        while (nowX != 0 && nowY != 7) {
-                            nowX--;
-                            nowY++;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 0) break;
-                                    if (board[nowX][nowY].getChecker().color == 1 && cellExist(nowX - 1, nowY + 1) &&
-                                            !board[nowX - 1][nowY + 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-                    }
-                }
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 0 && canByte(board[i][j])) return true;
             }
         }
         return false;
@@ -326,76 +332,10 @@ public class MainApp extends Application {
     public boolean needtobyteforBlack() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 1) {
-                    if (!board[i][j].getChecker().isDamka) {
-                        if (cellExist(i + 2, j + 2) && board[i + 1][j + 1].hasChecker() && !board[i + 2][j + 2].hasChecker()
-                                && board[i + 1][j + 1].getChecker().color == 0) return true;
-                        if (cellExist(i + 2, j - 2) && board[i + 1][j - 1].hasChecker() && !board[i + 2][j - 2].hasChecker()
-                                && board[i + 1][j - 1].getChecker().color == 0) return true;
-                        if (cellExist(i - 2, j + 2) && board[i - 1][j + 1].hasChecker() && !board[i - 2][j + 2].hasChecker()
-                                && board[i - 1][j + 1].getChecker().color == 0) return true;
-                        if (cellExist(i - 2, j - 2) && board[i - 1][j - 1].hasChecker() && !board[i - 2][j - 2].hasChecker()
-                                && board[i - 1][j - 1].getChecker().color == 0) return true;
-                    } else {
-                        int nowX = i;
-                        int nowY = j;
-                        while (nowX != 0 && nowY != 0) {
-                            nowX--;
-                            nowY--;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 1) break;
-                                    if (board[nowX][nowY].getChecker().color == 0 && cellExist(nowX - 1, nowY - 1) &&
-                                            !board[nowX - 1][nowY - 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-
-                        nowX = i;
-                        nowY = j;
-                        while (nowX != 7 && nowY != 0) {
-                            nowX++;
-                            nowY--;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 1) break;
-                                    if (board[nowX][nowY].getChecker().color == 0 && cellExist(nowX + 1, nowY - 1) &&
-                                            !board[nowX + 1][nowY - 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-
-                        nowX = i;
-                        nowY = j;
-                        while (nowX != 7 && nowY != 7) {
-                            nowX++;
-                            nowY++;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 1) break;
-                                    if (board[nowX][nowY].getChecker().color == 0 && cellExist(nowX + 1, nowY + 1) &&
-                                            !board[nowX + 1][nowY + 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-
-                        nowX = i;
-                        nowY = j;
-                        while (nowX != 0 && nowY != 7) {
-                            nowX--;
-                            nowY++;
-                            if (cellExist(nowX, nowY)) {
-                                if (board[nowX][nowY].hasChecker()) {
-                                    if (board[nowX][nowY].getChecker().color == 1) break;
-                                    if (board[nowX][nowY].getChecker().color == 0 && cellExist(nowX - 1, nowY + 1) &&
-                                            !board[nowX - 1][nowY + 1].hasChecker()) return true;
-                                }
-                            }
-                        }
-                    }
-                }
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 1 && canByte(board[i][j])) return true;
             }
         }
         return false;
     }
+
 }
