@@ -99,108 +99,110 @@ public class MainApp extends Application {
 
     public Checker newChecker(int x, int y, int color, int moveType, boolean isDamka) throws FileNotFoundException {
         Checker checker = new Checker(x, y, color, moveType, isDamka);
-
         checker.setOnMouseReleased(e -> {
             int newX = (int) Math.floor(checker.getLayoutX() / 100);
             int newY = (int) Math.floor(checker.getLayoutY() / 100);
-            int moveResult;
+            makeMove(newX, newY, checker);
+        });
+        return checker;
+    }
 
-            if (newX < 0 || newY < 0 || newX > 7 || newY > 7) moveResult = 0;
-            else moveResult = canMove(newX, newY, checker);
+    public void makeMove(int newX, int newY, Checker checker) {
+        int moveResult;
+        if (newX < 0 || newY < 0 || newX > 7 || newY > 7) moveResult = 0;
+        else moveResult = canMove(newX, newY, checker);
+        if (moveResult == 0) {
+            checker.getBack();
+        } else {
+            if (needtobyteforWhite() && checker.color == 0 && moveResult != 2) {
+                moveResult = 0;
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Warning");
+                alert.setHeaderText(null);
+                alert.setContentText("Now you must byte black checker!");
+                alert.showAndWait();
+            }
+
+            if (needtobyteforBlack() && checker.color == 1 && moveResult != 2) {
+                moveResult = 0;
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Warning");
+                alert.setHeaderText(null);
+                alert.setContentText("Now you must byte white checker!");
+                alert.showAndWait();
+            }
+
+            int nowX = (int) Math.floor(checker.getOldX() / 100);
+            int nowY = (int) Math.floor(checker.getOldY() / 100);
 
             if (moveResult == 0) {
                 checker.getBack();
-            } else {
-                if (needtobyteforWhite() && checker.color == 0 && moveResult != 2) {
-                    moveResult = 0;
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Warning");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Now you must byte black checker!");
-                    alert.showAndWait();
+            } else if (moveResult == 1) {
+                if (checker.color == 1 && newY == 7) checker.isDamka = true;
+                if (checker.color == 0 && newY == 0) checker.isDamka = true;
+                try {
+                    checker.setCrown();
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
                 }
+                checker.go(newX, newY);
+                board[nowX][nowY].setChecker(null);
+                board[newX][newY].setChecker(checker);
+                previousMoveColor = checker.color;
 
-                if (needtobyteforBlack() && checker.color == 1 && moveResult != 2) {
-                    moveResult = 0;
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Warning");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Now you must byte white checker!");
-                    alert.showAndWait();
+            } else if (moveResult == 2) {
+
+                checker.go(newX, newY);
+                board[nowX][nowY].setChecker(null);
+                board[newX][newY].setChecker(checker);
+
+                if (!checker.isDamka) {
+                    int evilX = (newX + nowX) / 2;
+                    int evilY = (newY + nowY) / 2;
+
+                    Checker evil = board[evilX][evilY].getChecker();
+                    board[evilX][evilY].setChecker(null);
+                    checkers.getChildren().remove(evil);
+                } else {
+                    int lx = (newX - nowX) / Math.abs(newX - nowX);
+                    int ly = (newY - nowY) / Math.abs(newY - nowY);
+                    int xx = nowX + lx;
+                    int yy = nowY + ly;
+                    while (!board[xx][yy].hasChecker()) {
+                        xx += lx;
+                        yy += ly;
+                    }
+                    Checker evil = board[xx][yy].getChecker();
+                    board[xx][yy].setChecker(null);
+                    checkers.getChildren().remove(evil);
                 }
+                if (!canByte(board[newX][newY])) previousMoveColor = checker.color;
 
-                int nowX = (int) Math.floor(checker.getOldX() / 100);
-                int nowY = (int) Math.floor(checker.getOldY() / 100);
-
-                if (moveResult == 0) {
-                    checker.getBack();
-                } else if (moveResult == 1) {
-                    if (checker.color == 1 && newY == 7) checker.isDamka = true;
-                    if (checker.color == 0 && newY == 0) checker.isDamka = true;
-                    try {
-                        checker.setCrown();
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
-                    }
-                    checker.go(newX, newY);
-                    board[nowX][nowY].setChecker(null);
-                    board[newX][newY].setChecker(checker);
-                    previousMoveColor = checker.color;
-
-                } else if (moveResult == 2) {
-
-                    checker.go(newX, newY);
-                    board[nowX][nowY].setChecker(null);
-                    board[newX][newY].setChecker(checker);
-
-                    if (!checker.isDamka) {
-                        int evilX = (newX + nowX) / 2;
-                        int evilY = (newY + nowY) / 2;
-
-                        Checker evil = board[evilX][evilY].getChecker();
-                        board[evilX][evilY].setChecker(null);
-                        checkers.getChildren().remove(evil);
-                    } else {
-                        int lx = (newX - nowX) / Math.abs(newX - nowX);
-                        int ly = (newY - nowY) / Math.abs(newY - nowY);
-                        int xx = nowX + lx;
-                        int yy = nowY + ly;
-                        while (!board[xx][yy].hasChecker()) {
-                            xx += lx;
-                            yy += ly;
-                        }
-                        Checker evil = board[xx][yy].getChecker();
-                        board[xx][yy].setChecker(null);
-                        checkers.getChildren().remove(evil);
-                    }
-                    if (!canByte(board[newX][newY])) previousMoveColor = checker.color;
-
-                    if (checker.color == 1 && newY == 7) checker.isDamka = true;
-                    if (checker.color == 0 && newY == 0) checker.isDamka = true;
-                    try {
-                        checker.setCrown();
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                checker.moveType = moveResult;
-
-                if (gameover().equals("White won") || gameover().equals("Black won")) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("We have winner!");
-                    alert.setHeaderText(null);
-                    alert.setContentText(gameover());
-                    alert.showAndWait();
-
-                    try {
-                        refresh();
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
-                    }
+                if (checker.color == 1 && newY == 7) checker.isDamka = true;
+                if (checker.color == 0 && newY == 0) checker.isDamka = true;
+                try {
+                    checker.setCrown();
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
                 }
             }
-        });
-        return checker;
+            checker.moveType = moveResult;
+
+            if (gameover().equals("White won") || gameover().equals("Black won")) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("We have winner!");
+                alert.setHeaderText(null);
+                alert.setContentText(gameover());
+                alert.showAndWait();
+
+                try {
+                    refresh();
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+
     }
 
     public void refresh() throws FileNotFoundException {
