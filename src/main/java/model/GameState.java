@@ -1,67 +1,31 @@
-import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+package model;
 
-import java.io.FileNotFoundException;
-
-public class MainApp extends Application {
-
+public class GameState {
     public Cell[][] board = new Cell[8][8];
-    public Group cells = new Group();
-    public Group checkers = new Group();
-
     public int previousMoveColor = 1;
 
-    public Parent getBoard() throws FileNotFoundException {
-        Pane root = new Pane();
-        root.setPrefSize(800, 800);
-
+    public void getBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                Cell cell = new Cell(i, j, (i + j) % 2);
-                board[i][j] = cell;
-
+                board[i][j] = new Cell(i, j, (i + j) % 2);
                 Checker checker = null;
-
+                board[i][j].setChecker(null);
                 if (j < 3 && board[i][j].color == 1) {
-                    checker = newChecker(i, j, 1, 0, false);
+                    checker = new Checker(i, j, 1, 0, false);
                 }
                 if (j > 4 && board[i][j].color == 1) {
-                    checker = newChecker(i, j, 0, 0, false);
+                    checker = new Checker(i, j, 0, 0, false);
                 }
-
                 if (checker != null) {
-                    cell.setChecker(checker);
-                    checkers.getChildren().add(board[i][j].getChecker());
+                    board[i][j].setChecker(checker);
                 }
-                cells.getChildren().add(cell);
             }
         }
-        root.getChildren().addAll(cells, checkers);
-        return root;
-    }
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        Scene scene = new Scene(getBoard(), 800, 800);
-        stage.setScene(scene);
-        stage.setTitle("Checkers");
-        stage.show();
-    }
-
-    public static void main(String[] args) {
-        Application.launch(args);
     }
 
     public int canMove(int newX, int newY, Checker checker) {
         if (checker.color == previousMoveColor) return 0;
-
         if (board[newX][newY].hasChecker() || (newX + newY) % 2 != 1) return 0;
-
         else {
             int nowX = (int) Math.floor(checker.getOldX() / 100);
             int nowY = (int) Math.floor(checker.getOldY() / 100);
@@ -97,61 +61,33 @@ public class MainApp extends Application {
         return 0;
     }
 
-    public Checker newChecker(int x, int y, int color, int moveType, boolean isDamka) throws FileNotFoundException {
-        Checker checker = new Checker(x, y, color, moveType, isDamka);
-        checker.setOnMouseReleased(e -> {
-            int newX = (int) Math.floor(checker.getLayoutX() / 100);
-            int newY = (int) Math.floor(checker.getLayoutY() / 100);
-            makeMove(newX, newY, checker);
-        });
-        return checker;
-    }
-
     public void makeMove(int newX, int newY, Checker checker) {
         int moveResult;
         if (newX < 0 || newY < 0 || newX > 7 || newY > 7) moveResult = 0;
         else moveResult = canMove(newX, newY, checker);
         if (moveResult == 0) {
-            checker.getBack();
         } else {
             if (needtobyteforWhite() && checker.color == 0 && moveResult != 2) {
                 moveResult = 0;
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Warning");
-                alert.setHeaderText(null);
-                alert.setContentText("Now you must byte black checker!");
-                alert.showAndWait();
             }
 
             if (needtobyteforBlack() && checker.color == 1 && moveResult != 2) {
                 moveResult = 0;
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Warning");
-                alert.setHeaderText(null);
-                alert.setContentText("Now you must byte white checker!");
-                alert.showAndWait();
             }
 
             int nowX = (int) Math.floor(checker.getOldX() / 100);
             int nowY = (int) Math.floor(checker.getOldY() / 100);
 
             if (moveResult == 0) {
-                checker.getBack();
             } else if (moveResult == 1) {
                 if (checker.color == 1 && newY == 7) checker.isDamka = true;
                 if (checker.color == 0 && newY == 0) checker.isDamka = true;
-                try {
-                    checker.setCrown();
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
-                }
                 checker.go(newX, newY);
                 board[nowX][nowY].setChecker(null);
                 board[newX][newY].setChecker(checker);
                 previousMoveColor = checker.color;
 
             } else if (moveResult == 2) {
-
                 checker.go(newX, newY);
                 board[nowX][nowY].setChecker(null);
                 board[newX][newY].setChecker(checker);
@@ -162,7 +98,7 @@ public class MainApp extends Application {
 
                     Checker evil = board[evilX][evilY].getChecker();
                     board[evilX][evilY].setChecker(null);
-                    checkers.getChildren().remove(evil);
+
                 } else {
                     int lx = (newX - nowX) / Math.abs(newX - nowX);
                     int ly = (newY - nowY) / Math.abs(newY - nowY);
@@ -172,56 +108,28 @@ public class MainApp extends Application {
                         xx += lx;
                         yy += ly;
                     }
-                    Checker evil = board[xx][yy].getChecker();
                     board[xx][yy].setChecker(null);
-                    checkers.getChildren().remove(evil);
                 }
                 if (!canByte(board[newX][newY])) previousMoveColor = checker.color;
 
                 if (checker.color == 1 && newY == 7) checker.isDamka = true;
                 if (checker.color == 0 && newY == 0) checker.isDamka = true;
-                try {
-                    checker.setCrown();
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
+
+                if (gameover().equals("White won") || gameover().equals("Black won")) {
+                    getBoard();
+                    previousMoveColor = 1;
                 }
             }
-            checker.moveType = moveResult;
+
+            if (checker.color == 1 && newY == 7) checker.isDamka = true;
+            if (checker.color == 0 && newY == 0) checker.isDamka = true;
 
             if (gameover().equals("White won") || gameover().equals("Black won")) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("We have winner!");
-                alert.setHeaderText(null);
-                alert.setContentText(gameover());
-                alert.showAndWait();
-
-                try {
-                    refresh();
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
-                }
+                getBoard();
+                previousMoveColor = 1;
             }
         }
-
-    }
-
-    public void refresh() throws FileNotFoundException {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker()) checkers.getChildren().remove(board[i][j].getChecker());
-                board[i][j].setChecker(null);
-                if (j < 3 && board[i][j].color == 1) {
-                    board[i][j].setChecker(newChecker(i, j, 1, 0, false));
-                }
-                if (j > 4 && board[i][j].color == 1) {
-                    board[i][j].setChecker(newChecker(i, j, 0, 0, false));
-                }
-                if (board[i][j].hasChecker()) {
-                    checkers.getChildren().add(board[i][j].getChecker());
-                }
-            }
-        }
-        previousMoveColor = 1;
+        checker.moveType = moveResult;
     }
 
     public String gameover() {
@@ -269,8 +177,9 @@ public class MainApp extends Application {
                     if (cellExist(nowX, nowY)) {
                         if (board[nowX][nowY].hasChecker()) {
                             if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
-                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX - 1, nowY - 1) &&
-                                    !board[nowX - 1][nowY - 1].hasChecker()) return true;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color &&
+                                    cellExist(nowX - 1, nowY - 1) && !board[nowX - 1][nowY - 1].hasChecker())
+                                return true;
                         }
                     }
                 }
@@ -283,8 +192,9 @@ public class MainApp extends Application {
                     if (cellExist(nowX, nowY)) {
                         if (board[nowX][nowY].hasChecker()) {
                             if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
-                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX + 1, nowY - 1) &&
-                                    !board[nowX + 1][nowY - 1].hasChecker()) return true;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color &&
+                                    cellExist(nowX + 1, nowY - 1) && !board[nowX + 1][nowY - 1].hasChecker())
+                                return true;
                         }
                     }
                 }
@@ -297,8 +207,9 @@ public class MainApp extends Application {
                     if (cellExist(nowX, nowY)) {
                         if (board[nowX][nowY].hasChecker()) {
                             if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
-                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX + 1, nowY + 1) &&
-                                    !board[nowX + 1][nowY + 1].hasChecker()) return true;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color &&
+                                    cellExist(nowX + 1, nowY + 1) && !board[nowX + 1][nowY + 1].hasChecker())
+                                return true;
                         }
                     }
                 }
@@ -311,8 +222,9 @@ public class MainApp extends Application {
                     if (cellExist(nowX, nowY)) {
                         if (board[nowX][nowY].hasChecker()) {
                             if (board[nowX][nowY].getChecker().color == cell.getChecker().color) break;
-                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color && cellExist(nowX - 1, nowY + 1) &&
-                                    !board[nowX - 1][nowY + 1].hasChecker()) return true;
+                            if (board[nowX][nowY].getChecker().color != cell.getChecker().color &&
+                                    cellExist(nowX - 1, nowY + 1) && !board[nowX - 1][nowY + 1].hasChecker())
+                                return true;
                         }
                     }
                 }
@@ -324,7 +236,8 @@ public class MainApp extends Application {
     public boolean needtobyteforWhite() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 0 && canByte(board[i][j])) return true;
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 0 && canByte(board[i][j]))
+                    return true;
             }
         }
         return false;
@@ -333,10 +246,10 @@ public class MainApp extends Application {
     public boolean needtobyteforBlack() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 1 && canByte(board[i][j])) return true;
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == 1 && canByte(board[i][j]))
+                    return true;
             }
         }
         return false;
     }
-
 }
