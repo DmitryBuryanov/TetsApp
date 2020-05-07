@@ -24,21 +24,22 @@ public class CheckerModel extends StackPane {
         this.isDamka = isDamka;
 
         Circle circle = new Circle();
-        circle.setRadius(40);
-        if (this.checker.color == 1)
+        circle.setRadius(0.4 * MainApp.size);
+        if (this.checker.color == model.Color.Black)
             circle.setFill(Color.BLACK);
         else circle.setFill(Color.WHITESMOKE);
-        relocate((x + 0.1) * 100, (y + 0.1) * 100);
+        relocate((x + 0.1) * MainApp.size, (y + 0.1) * MainApp.size);
         setOnMouseDragged(e -> {
-            relocate((Math.floor(e.getSceneX() / 100) + 0.1) * 100, (Math.floor(e.getSceneY() / 100) + 0.1) * 100);
+            relocate((Math.floor(e.getSceneX() / MainApp.size) + 0.1) * MainApp.size,
+                    (Math.floor(e.getSceneY() / MainApp.size) + 0.1) * MainApp.size);
         });
         getChildren().add(circle);
 
         if (isDamka) {
             Image image = new Image(new FileInputStream(new File("src\\main\\resources\\crown.png").getAbsolutePath()));
             ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(40);
-            imageView.setFitHeight(40);
+            imageView.setFitWidth(0.4 * MainApp.size);
+            imageView.setFitHeight(0.4 * MainApp.size);
             getChildren().add(imageView);
         }
     }

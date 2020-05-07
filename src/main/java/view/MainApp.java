@@ -16,14 +16,15 @@ import java.io.FileNotFoundException;
 public class MainApp extends Application {
 
     GameState gameState = new GameState();
-    public Group cells = new Group();
-    public Group checkers = new Group();
+    private Group cells = new Group();
+    private Group checkers = new Group();
+    public static int size = 90;
 
-    public Pane makeBoard() throws Exception {
+    private Pane makeBoard() throws Exception {
         gameState.getBoard();
         fillBoard();
         Pane root = new Pane();
-        root.setPrefSize(800, 800);
+        root.setPrefSize(8 * size, 8 * size);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Rectangle rectangle = createCell(i, j);
@@ -34,7 +35,7 @@ public class MainApp extends Application {
         return root;
     }
 
-    public void fillBoard() throws FileNotFoundException {
+    private void fillBoard() throws FileNotFoundException {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Checker checker;
@@ -49,7 +50,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Scene scene = new Scene(makeBoard(), 800, 800);
+        Scene scene = new Scene(makeBoard(), 8 * size, 8 * size);
         stage.setScene(scene);
         stage.setTitle("Checkers");
         stage.show();
@@ -59,23 +60,23 @@ public class MainApp extends Application {
         Application.launch(args);
     }
 
-    public Rectangle createCell(int i, int j) {
+    private Rectangle createCell(int i, int j) {
         Rectangle rectangle = new Rectangle();
-        rectangle.setHeight(100);
-        rectangle.setWidth(100);
-        if (gameState.board[i][j].color == 1) rectangle.setFill(Color.BROWN);
+        rectangle.setHeight(size);
+        rectangle.setWidth(size);
+        if (gameState.board[i][j].color == model.Color.Brown) rectangle.setFill(Color.BROWN);
         else rectangle.setFill(Color.BEIGE);
-        rectangle.relocate(i * 100, j * 100);
+        rectangle.relocate(i * size, j * size);
         return rectangle;
     }
 
-    public CheckerModel createChecker(int i, int j, Checker checker, boolean isDamka) throws FileNotFoundException {
+    private CheckerModel createChecker(int i, int j, Checker checker, boolean isDamka) throws FileNotFoundException {
         CheckerModel checkerModel = new CheckerModel(i, j, checker, isDamka);
         checkerModel.setOnMouseReleased(e -> {
-            int newX = (int) Math.floor(e.getSceneX() / 100);
-            int newY = (int) Math.floor(e.getSceneY() / 100);
+            int newX = (int) Math.floor(e.getSceneX() / size);
+            int newY = (int) Math.floor(e.getSceneY() / size);
 
-            if (gameState.previousMoveColor == 1 && gameState.needtobyteforWhite() && checker.color == 0 &&
+            if (gameState.previousMoveColor == model.Color.Black && gameState.needtobyteforWhite() && checker.color == model.Color.White &&
                     gameState.canMove(newX, newY, checker) != 2) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Warning");
@@ -84,7 +85,7 @@ public class MainApp extends Application {
                 alert.showAndWait();
             }
 
-            if (gameState.previousMoveColor == 0 && gameState.needtobyteforBlack() && checker.color == 1 &&
+            if (gameState.previousMoveColor == model.Color.White && gameState.needtobyteforBlack() && checker.color == model.Color.Black &&
                     gameState.canMove(newX, newY, checker) != 2) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Warning");

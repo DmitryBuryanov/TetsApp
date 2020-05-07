@@ -1,13 +1,13 @@
 package model;
 
 public class Checker {
-    public int color;
+    public Color color;
     public double oldX;
     public double oldY;
     public int moveType;
     public boolean isDamka;
 
-    public Checker(int x, int y, int color, int moveType, boolean isDamka) {
+    public Checker(int x, int y, Color color, int moveType, boolean isDamka) {
         this.color = color;
         this.moveType = moveType;
         this.isDamka = isDamka;
