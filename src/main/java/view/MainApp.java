@@ -76,8 +76,8 @@ public class MainApp extends Application {
             int newX = (int) Math.floor(e.getSceneX() / size);
             int newY = (int) Math.floor(e.getSceneY() / size);
 
-            if (gameState.previousMoveColor == model.Color.Black && gameState.needtobyteforWhite() && checker.color == model.Color.White &&
-                    gameState.canMove(newX, newY, checker) != 2) {
+            if (gameState.previousMoveColor == model.Color.Black && gameState.needtobyteforWhite() &&
+                    checker.color == model.Color.White && gameState.canMove(newX, newY, checker) != 2) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Warning");
                 alert.setHeaderText(null);
@@ -85,8 +85,8 @@ public class MainApp extends Application {
                 alert.showAndWait();
             }
 
-            if (gameState.previousMoveColor == model.Color.White && gameState.needtobyteforBlack() && checker.color == model.Color.Black &&
-                    gameState.canMove(newX, newY, checker) != 2) {
+            if (gameState.previousMoveColor == model.Color.White && gameState.needtobyteforBlack() &&
+                    checker.color == model.Color.Black && gameState.canMove(newX, newY, checker) != 2) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Warning");
                 alert.setHeaderText(null);
@@ -96,7 +96,7 @@ public class MainApp extends Application {
 
             gameState.makeMove(newX, newY, checker);
 
-            if (gameState.board[1][0].hasChecker() && gameState.board[3][0].hasChecker() &&
+            if (gameState.moveCount!= 0 && gameState.board[1][0].hasChecker() && gameState.board[3][0].hasChecker() &&
                     gameState.board[5][0].hasChecker() && gameState.board[7][0].hasChecker() &&
                     gameState.board[0][1].hasChecker() && gameState.board[2][1].hasChecker() &&
                     gameState.board[4][1].hasChecker() && gameState.board[6][1].hasChecker() &&

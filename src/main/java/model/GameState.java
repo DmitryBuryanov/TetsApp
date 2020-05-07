@@ -3,6 +3,7 @@ package model;
 public class GameState {
     public Cell[][] board = new Cell[8][8];
     public Color previousMoveColor = Color.Black;
+    public int moveCount = 0;
 
     public void getBoard() {
         for (int i = 0; i < 8; i++) {
@@ -24,6 +25,7 @@ public class GameState {
                 }
             }
         }
+        moveCount = 0;
     }
 
     public int canMove(int newX, int newY, Checker checker) {
@@ -81,6 +83,7 @@ public class GameState {
             checker.go(newX, newY);
             board[nowX][nowY].setChecker(null);
             board[newX][newY].setChecker(checker);
+            moveCount++;
             if (moveResult == 1) {
                 if (checker.color == Color.Black && newY == 7) checker.isDamka = true;
                 if (checker.color == Color.White && newY == 0) checker.isDamka = true;
