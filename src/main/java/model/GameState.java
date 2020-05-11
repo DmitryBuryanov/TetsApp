@@ -2,23 +2,23 @@ package model;
 
 public class GameState {
     public Cell[][] board = new Cell[8][8];
-    public Color previousMoveColor = Color.Black;
+    public Color previousMoveColor = Color.BLACK;
     public int moveCount = 0;
 
     public void getBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Color color;
-                if ((i + j) % 2 == 0) color = Color.Beige;
-                else color = Color.Brown;
+                if ((i + j) % 2 == 0) color = Color.BEIGE;
+                else color = Color.BROWN;
                 board[i][j] = new Cell(i, j, color);
                 Checker checker = null;
                 board[i][j].setChecker(null);
-                if (j < 3 && board[i][j].color == Color.Brown) {
-                    checker = new Checker(i, j, Color.Black, 0, false);
+                if (j < 3 && board[i][j].color == Color.BROWN) {
+                    checker = new Checker(i, j, Color.BLACK, 0, false);
                 }
-                if (j > 4 && board[i][j].color == Color.Brown) {
-                    checker = new Checker(i, j, Color.White, 0, false);
+                if (j > 4 && board[i][j].color == Color.BROWN) {
+                    checker = new Checker(i, j, Color.WHITE, 0, false);
                 }
                 if (checker != null) {
                     board[i][j].setChecker(checker);
@@ -35,8 +35,8 @@ public class GameState {
             int nowX = (int) Math.floor(checker.getOldX() / 100);
             int nowY = (int) Math.floor(checker.getOldY() / 100);
             if (!checker.isDamka) {
-                if (checker.color == Color.Black && Math.abs(newX - nowX) == 1 && newY - nowY == 1 ||
-                        checker.color == Color.White && Math.abs(newX - nowX) == 1 && newY - nowY == -1) {
+                if (checker.color == Color.BLACK && Math.abs(newX - nowX) == 1 && newY - nowY == 1 ||
+                        checker.color == Color.WHITE && Math.abs(newX - nowX) == 1 && newY - nowY == -1) {
                     return 1;
                 }
                 int evilX = (newX + nowX) / 2;
@@ -71,8 +71,8 @@ public class GameState {
         if (newX < 0 || newY < 0 || newX > 7 || newY > 7) moveResult = 0;
         else moveResult = canMove(newX, newY, checker);
 
-        if ((needtobyteforWhite() && checker.color == Color.White || needtobyteforBlack()
-                && checker.color == Color.Black) && moveResult != 2) {
+        if ((needtobyteforWhite() && checker.color == Color.WHITE || needtobyteforBlack()
+                && checker.color == Color.BLACK) && moveResult != 2) {
             moveResult = 0;
         }
 
@@ -85,8 +85,8 @@ public class GameState {
             board[newX][newY].setChecker(checker);
             moveCount++;
             if (moveResult == 1) {
-                if (checker.color == Color.Black && newY == 7) checker.isDamka = true;
-                if (checker.color == Color.White && newY == 0) checker.isDamka = true;
+                if (checker.color == Color.BLACK && newY == 7) checker.isDamka = true;
+                if (checker.color == Color.WHITE && newY == 0) checker.isDamka = true;
                 previousMoveColor = checker.color;
 
             } else if (moveResult == 2) {
@@ -108,21 +108,21 @@ public class GameState {
                 }
                 if (!canByte(board[newX][newY])) previousMoveColor = checker.color;
 
-                if (checker.color == Color.Black && newY == 7) checker.isDamka = true;
-                if (checker.color == Color.White && newY == 0) checker.isDamka = true;
+                if (checker.color == Color.BLACK && newY == 7) checker.isDamka = true;
+                if (checker.color == Color.WHITE && newY == 0) checker.isDamka = true;
 
                 if (gameover().equals("White won") || gameover().equals("Black won")) {
                     getBoard();
-                    previousMoveColor = Color.Black;
+                    previousMoveColor = Color.BLACK;
                 }
             }
 
-            if (checker.color == Color.Black && newY == 7 || checker.color == Color.White && newY == 0)
+            if (checker.color == Color.BLACK && newY == 7 || checker.color == Color.WHITE && newY == 0)
                 checker.isDamka = true;
 
             if (gameover().equals("White won") || gameover().equals("Black won")) {
                 getBoard();
-                previousMoveColor = Color.Black;
+                previousMoveColor = Color.BLACK;
             }
         }
         checker.moveType = moveResult;
@@ -134,8 +134,8 @@ public class GameState {
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.Black) black += 1;
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.White) white += 1;
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.BLACK) black += 1;
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.WHITE) white += 1;
             }
         }
         if (black == 0) {
@@ -232,7 +232,7 @@ public class GameState {
     public boolean needtobyteforWhite() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.White && canByte(board[i][j]))
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.WHITE && canByte(board[i][j]))
                     return true;
             }
         }
@@ -242,7 +242,7 @@ public class GameState {
     public boolean needtobyteforBlack() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.Black && canByte(board[i][j]))
+                if (board[i][j].hasChecker() && board[i][j].getChecker().color == Color.BLACK && canByte(board[i][j]))
                     return true;
             }
         }

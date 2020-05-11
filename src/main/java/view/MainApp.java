@@ -64,7 +64,7 @@ public class MainApp extends Application {
         Rectangle rectangle = new Rectangle();
         rectangle.setHeight(size);
         rectangle.setWidth(size);
-        if (gameState.board[i][j].color == model.Color.Brown) rectangle.setFill(Color.BROWN);
+        if (gameState.board[i][j].color == model.Color.BROWN) rectangle.setFill(Color.BROWN);
         else rectangle.setFill(Color.BEIGE);
         rectangle.relocate(i * size, j * size);
         return rectangle;
@@ -76,8 +76,8 @@ public class MainApp extends Application {
             int newX = (int) Math.floor(e.getSceneX() / size);
             int newY = (int) Math.floor(e.getSceneY() / size);
 
-            if (gameState.previousMoveColor == model.Color.Black && gameState.needtobyteforWhite() &&
-                    checker.color == model.Color.White && gameState.canMove(newX, newY, checker) != 2) {
+            if (gameState.previousMoveColor == model.Color.BLACK && gameState.needtobyteforWhite() &&
+                    checker.color == model.Color.WHITE && gameState.canMove(newX, newY, checker) != 2) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Warning");
                 alert.setHeaderText(null);
@@ -85,8 +85,8 @@ public class MainApp extends Application {
                 alert.showAndWait();
             }
 
-            if (gameState.previousMoveColor == model.Color.White && gameState.needtobyteforBlack() &&
-                    checker.color == model.Color.Black && gameState.canMove(newX, newY, checker) != 2) {
+            if (gameState.previousMoveColor == model.Color.WHITE && gameState.needtobyteforBlack() &&
+                    checker.color == model.Color.BLACK && gameState.canMove(newX, newY, checker) != 2) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Warning");
                 alert.setHeaderText(null);

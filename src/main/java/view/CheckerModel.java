@@ -25,7 +25,7 @@ public class CheckerModel extends StackPane {
 
         Circle circle = new Circle();
         circle.setRadius(0.4 * MainApp.size);
-        if (this.checker.color == model.Color.Black)
+        if (this.checker.color == model.Color.BLACK)
             circle.setFill(Color.BLACK);
         else circle.setFill(Color.WHITESMOKE);
         relocate((x + 0.1) * MainApp.size, (y + 0.1) * MainApp.size);
