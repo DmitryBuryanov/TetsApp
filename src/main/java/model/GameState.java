@@ -67,6 +67,7 @@ public class GameState {
     }
 
     public void makeMove(int newX, int newY, Checker checker) {
+        moveCount++;
         int moveResult;
         if (newX < 0 || newY < 0 || newX > 7 || newY > 7) moveResult = 0;
         else moveResult = canMove(newX, newY, checker);
@@ -83,7 +84,6 @@ public class GameState {
             checker.go(newX, newY);
             board[nowX][nowY].setChecker(null);
             board[newX][newY].setChecker(checker);
-            moveCount++;
             if (moveResult == 1) {
                 if (checker.color == Color.BLACK && newY == 7) checker.isDamka = true;
                 if (checker.color == Color.WHITE && newY == 0) checker.isDamka = true;
