@@ -95,7 +95,6 @@ public class MainApp extends Application {
             }
 
             gameState.makeMove(newX, newY, checker);
-            System.out.println(gameState.moveCount);
 
             if (gameState.moveCount == 0 && gameState.board[1][0].hasChecker() && gameState.board[3][0].hasChecker() &&
                     gameState.board[5][0].hasChecker() && gameState.board[7][0].hasChecker() &&
